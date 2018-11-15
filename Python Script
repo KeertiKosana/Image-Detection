@@ -1,0 +1,24 @@
+from subprocess import Popen, PIPE
+from collections import Counter
+import os 
+
+private_file_path = "dataset/private/"
+public_file_path = "dataset/public"
+
+objects = {}
+
+for files in os.listdir(private_file_path): 
+    print files
+    p = Popen(['./darknet', 'detect', 'cfg/yolov3.cfg', 'yolov3.weights', 'dataset'+'/' + 'private'+ '/' + str(files)],
+    cwd = '/home/skosana/darknet', stdout = PIPE, stderr = PIPE)
+    stdout, stderr = p.communicate()
+    print stdout    
+
+    for obj in stdout.split('\n')[1:]:
+        if not obj:
+	       break
+        for l in obj.rsplit(":",1)[:-1]:
+	       print "Object is " + l
+	       objects[l] = objects.get(l,0)+1
+		 		 
+print dict(Counter(objects).most_common(10))
